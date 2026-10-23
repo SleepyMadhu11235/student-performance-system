@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: student-performance-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DB_ENGINE
+        value: mysql
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: CORS_ALLOW_VERCEL_PREVIEWS
+        value: "True"

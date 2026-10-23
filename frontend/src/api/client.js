@@ -1,13 +1,22 @@
 import axios from 'axios'
 
-// Vite exposes env vars prefixed VITE_ on import.meta.env. Falls back to the
-// Django dev server default so `npm run dev` works out of the box alongside
-// `python manage.py runserver` with zero extra config.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+// Vite exposes env vars prefixed VITE_ on import.meta.env.
+// Normalizes the URL: strips trailing slashes and ensures /api prefix
+const resolveApiBaseUrl = () => {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim()
+  if (!envUrl) {
+    return 'http://localhost:8000/api'
+  }
+  const stripped = envUrl.replace(/\/+$/, '')
+  return stripped.endsWith('/api') ? stripped : `${stripped}/api`
+}
+
+const API_BASE_URL = resolveApiBaseUrl()
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 20000,
+  // 60-second timeout accommodates free-tier spinning services (Render cold-start wake-up)
+  timeout: 60000,
 })
 
 export { API_BASE_URL }
@@ -43,7 +52,7 @@ apiClient.interceptors.response.use(
     }
     if (error.request) {
       return Promise.reject(
-        new ApiError('Could not reach the server. Is the Django backend running?', {
+        new ApiError('Could not reach the server. If this is Render free tier, it may be waking up (give it 30-60s) or check your backend URL.', {
           code: 'NETWORK_ERROR',
         }),
       )
