@@ -123,6 +123,13 @@ def _build_database_config():
         db_conf["OPTIONS"] = {}
     db_conf["OPTIONS"]["charset"] = "utf8mb4"
 
+    # Clean up parameters that dj-database-url injects from URL query strings
+    # (e.g. ?ssl-mode=REQUIRED), which PyMySQL rejects with TypeError.
+    for invalid_opt in ["ssl-mode", "sslmode", "ssl_mode"]:
+        db_conf["OPTIONS"].pop(invalid_opt, None)
+
+    ca_from_query = db_conf["OPTIONS"].pop("ssl-ca", None) or db_conf["OPTIONS"].pop("ssl_ca", None)
+
     # SSL Handling for Aiven / Cloud MySQL
     ssl_disabled = os.getenv("DB_SSL_DISABLED", "False").lower() in ("true", "1")
     host = db_conf.get("HOST", "")
@@ -149,6 +156,9 @@ def _build_database_config():
             candidate = _resolve(os.getenv("DB_SSL_CA"))
             if candidate.exists():
                 ca_path = str(candidate)
+
+        if not ca_path and ca_from_query and Path(ca_from_query).exists():
+            ca_path = str(ca_from_query)
 
         if not ca_path and (BASE_DIR / "ca.pem").exists():
             ca_path = str(BASE_DIR / "ca.pem")

@@ -251,8 +251,10 @@ Perform these sanity tests to ensure all systems are communicating smoothly:
 - **Built-in Protection**: We increased the frontend request timeout to **60 seconds** in `client.js` so it won't prematurely error while Render is spinning up.
 - **Tip to keep it awake**: You can use a free uptime monitoring service like [UptimeRobot](https://uptimerobot.com) or [cron-job.org](https://cron-job.org) to ping your health endpoint (`https://<your-backend>.onrender.com/health`) every 10 minutes.
 
-### 2. Database Connection Error (`Access denied` or `SSL connection failed`)
-- Ensure your Aiven service status is **Running**.
+### 2. Database Connection Error or `unexpected keyword argument 'ssl-mode'`
+- **What happened**: When using Aiven's Service URI (`mysql://avnadmin:pass@host:port/defaultdb?ssl-mode=REQUIRED`), `dj-database-url` extracts `?ssl-mode=REQUIRED` into Django's database `OPTIONS`. PyMySQL does not accept hyphens in `ssl-mode` and expects `ssl` object directly.
+- **The Fix**: Our updated `settings.py` automatically detects and strips `ssl-mode` from `OPTIONS` while keeping Python's TLS encryption handshake active.
+- Ensure your Aiven service status is **Running** in green.
 - Verify that `DB_HOST`, `DB_PORT`, `DB_USER`, and `DB_PASSWORD` in Render match Aiven's connection card exactly.
 - Make sure `DB_PORT` is the exact 5-digit port specified by Aiven (NOT default `3306`).
 - If you use `DATABASE_URL`, ensure special characters in your password are properly URL-encoded or use discrete variables (`DB_PASSWORD`).
