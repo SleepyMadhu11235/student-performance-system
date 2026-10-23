@@ -1,0 +1,39 @@
+{
+  "trained_at": "2026-07-23T11:16:46.159406+00:00",
+  "dataset_rows": 1500,
+  "champion_model": "Random Forest",
+  "models": [
+    {
+      "model": "Random Forest",
+      "accuracy": 0.7844,
+      "precision": 0.7815,
+      "recall": 0.7844,
+      "f1": 0.7822,
+      "is_champion": true
+    },
+    {
+      "model": "Decision Tree",
+      "accuracy": 0.6689,
+      "precision": 0.6718,
+      "recall": 0.6689,
+      "f1": 0.6693,
+      "is_champion": false
+    },
+    {
+      "model": "Gaussian NB",
+      "accuracy": 0.7689,
+      "precision": 0.7778,
+      "recall": 0.7689,
+      "f1": 0.7705,
+      "is_champion": false
+    },
+    {
+      "model": "K-Nearest Neighbors",
+      "accuracy": 0.7778,
+      "precision": 0.7747,
+      "recall": 0.7778,
+      "f1": 0.775,
+      "is_champion": false
+    }
+  ]
+}
